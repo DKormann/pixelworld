@@ -6,9 +6,9 @@
     <title>TypeScript Editor</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs/loader.min.js"></script>
     <style>
-      body { margin: 0; }
-      #container {
-        width: 100vw;
+      body {
+        margin: 0;
+        padding: 0;
         height: 100vh;
         display: flex;
         flex-direction: column;
@@ -16,13 +16,12 @@
       #editor {
         flex: 1;
         border: none;
+        width: 100%;
       }
     </style>
   </head>
   <body>
-    <div id="container">
-      <div id="editor"></div>
-    </div>
+    <div id="editor"></div>
     <script type="module" src="src/editor.ts"></script>
   </body>
 </html>
