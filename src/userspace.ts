@@ -8,7 +8,7 @@ import { Block, State } from "./world";
 
 export async function LoadUserFunction(){
 
-  const userScript =new Writable("UserScript", "");
+  const userScript = new Writable("UserScript", "");
 
   console.log(userScript.value);
 
