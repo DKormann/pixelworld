@@ -1,131 +1,134 @@
-# pixel based full scriptable magic game
+# Pixel World - Scriptable Pixel Game
 
-try out https://pxxl-world.github.io
+A fully scriptable pixel-based game where you can code your character's behavior using JavaScript.
 
-code you character, play on server
+## Getting Started
 
-# Character Scripting Documentation
+1. Visit https://dkormann/pixelworld
+2. Click "Show Code" in the top left corner
+3. Select a character script or create your own
+4. Click "Play" to start playing with your character
+5. Use arrow keys to control your character
+6. If you die, click "Reset Player" to restart
 
-Welcome to the character scripting documentation for the game! This guide will help you create and customize your own character behaviors using JavaScript.
+## API Documentation
 
-## Quickstart
+### Main Function Structure
 
-click on Show Code in the top left, select one of the Available characters, maybe edit its code and click play in the top left again to use the character. If you die you can click Reset Player.
+The game provides a simple API for creating character behaviors. Your main function will receive two parameters:
 
-## Available Characters
-
-The game comes with several pre-built character scripts that you can use as examples:
-- `snake`: A basic character that moves around
-- `pan`: A gray character with shooting capabilities
-- `snake`: A green moving character
-- `eater`: A character that eats other blocks
-- `hydra`: A black character with shooting abilities
-- `misterX`: A red character with shooting capabilities
-
-
-## Available Functions
-
-### `action(params, actor)`
-
-The main function for performing actions in the game. Parameters include:
-
-- `action`: The type of action to perform ("move", "put", "delete", "info")
-- `x`, `y`: Starting coordinates
-- `endx`, `endy`: Ending coordinates (for move actions)
-- `color`: Color for "put" actions
-- `energy`: Energy value for "put" actions
-
-Example usage:
 ```javascript
-// Move character
-await action({
-    action: 'move',
-    x: player.position.x,
-    y: player.position.y,
-    endx: x + direction[0] * speed,
-    endy: y + direction[1] * speed
-})
-
-// Place a block
-await action({
-    action: 'put',
-    color: '#ff0000',
-    x: player.position.x,
-    y: player.position.y,
-    energy: 50
-})
+function main(state, player) {
+  // Your character logic here
+}
 ```
 
+### State Object
 
-## Player Properties
+The `state` object provides access to the game world and keyboard input:
 
-The `player` object contains the following properties:
-- `position`: Object with `x` and `y` coordinates
-- `energy`: Current energy level
-- `id`: Unique player ID
+```typescript
+interface State {
+  world: {
+    pixels: (null | Block)[][];
+    subscribe: (fn: (focus: Pos | undefined) => void) => () => void;
+    setPixel: (pos: Pos, color: Tile | null) => void;
+    getPixel: (pos: Pos) => Block | null;
+  };
+  keyboard: {
+    isPressed: (key: string) => boolean;
+    subscribe: (fn: (key: string) => void) => () => void;
+  };
+}
+```
 
-## State Information
+### Block Object
 
-The `state` object provides access to the game world:
-- `state.world`: 2D array representing the game world
+The `Block` object represents your character and provides actions you can perform:
 
-## Example Script
+```typescript
+interface Block {
+  alive: boolean;
+  move: (pos: Pos) => Promise<Block>;
+  del: (pos: Pos) => Promise<void>;
+  put: (pos: Pos, color: Color, energy?: number) => Promise<Block>;
+  energy: number;
+  pos: Pos;
+  id: number;
+  color: Color;
+}
+```
 
-Here's a complete example of a basic character script:
+### Actions
+
+Your character can perform three main types of actions:
+
+1. **Move**: Move to a new position
+   ```javascript
+   await player.move([newX, newY]);
+   ```
+
+2. **Delete**: Delete a block at a position
+   ```javascript
+   await player.del([x, y]);
+   ```
+
+3. **Put**: Place a new block with color and energy
+   ```javascript
+   await player.put([x, y], [255, 0, 0], 50); // Red block with 50 energy
+   ```
+
+### World Size
+
+The game world is 128x128 pixels.
+
+### Example Script
+
+Here's a simple character script that moves around and interacts with the world:
 
 ```javascript
-let color = '#00ff00'
-let speed = 1
-let interval = 1000/20
-let direction = [0, 0]
+function main(state, player) {
+  console.log("Character loaded!");
+  
+  // Subscribe to keyboard events
+  state.keyboard.subscribe(async key => {
+    let x = 0;
+    let y = 0;
 
-function setkeymap(key, active) {
-    keymap.set(key, active)
-    direction = [keymap.get('ArrowRight') - keymap.get('ArrowLeft'), 
-                keymap.get('ArrowDown') - keymap.get('ArrowUp')]
-    if (direction[0] || direction[1]) {
-        if (!running) {
-            running = true
-            walk()
-        }
-    } else {
-        running = false
-    }
-}
+    // Handle arrow keys
+    if (key === "ArrowUp") y -= 1;
+    if (key === "ArrowDown") y += 1;
+    if (key === "ArrowLeft") x -= 1;
+    if (key === "ArrowRight") x += 1;
 
-async function step() {
-    const x = player.position.x
-    const y = player.position.y
-    const endx = x + direction[0] * speed
-    const endy = y + direction[1] * speed
+    // Calculate target position
+    const target = [player.pos[0] + x, player.pos[1] + y];
     
-    await action({
-        action: 'move',
-        x, y, endx, endy
-    })
-    .then(() => action({
-        action: 'put',
-        color: color,
-        x, y
-    }))
-    .catch(e => console.log("walk error:", e))
+    // Try to move or delete block
+    if (state.world.getPixel(target)) {
+      await player.del(target);
+    } else {
+      await player.move(target);
+    }
+  });
 }
-
-async function walk() {
-    if (!running) return
-    await step()
-    setTimeout(walk, interval)
-}
-
-const keymap = new Map(["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].map(key => [key, false]))
-
-// Event listeners
-document.addEventListener('keydown', e => {
-    if (e.key.startsWith("Arrow")) e.preventDefault()
-    setkeymap(e.key, true)
-})
-
-document.addEventListener('keyup', e => {
-    setkeymap(e.key, false)
-})
 ```
+
+## Development
+
+The game is built with TypeScript and Vite. To run locally:
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+3. Build for production:
+   ```bash
+   npm run build
+   ```

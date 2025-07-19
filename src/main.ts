@@ -1,10 +1,11 @@
 import { Writable } from './store'
 import { ActionResultVariant, DbConnection, GameAction, Person } from './module_bindings';
-
 import { LoadUserFunction } from './userspace';
 
 
 const app = document.querySelector<HTMLDivElement>('#app')!
+
+const serverUrl = window.location.pathname.split("/").includes("local") ? "ws://localhost:3000" : "wss://maincloud.spacetimedb.com"
 
 
 let dbtoken = new Writable("dbtoken", "")
@@ -12,7 +13,7 @@ let dbtoken = new Writable("dbtoken", "")
 import { Block, int2pos, makestate, world_size } from './world';
 
 DbConnection.builder()
-.withUri("ws://localhost:3000")
+.withUri(serverUrl)
 .withModuleName("pixel")
 .withToken(dbtoken.value)
 .onConnect((connect, id, token )=>{
