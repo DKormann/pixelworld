@@ -1,4 +1,4 @@
-import{m as s}from"./editor.5wU2-wMl.js";import"./store.B0ay3j7c.js";import"./userspace.cwezg4oZ.js";/*!-----------------------------------------------------------------------------
+import{m as s}from"./editor.DVVj5N8S.js";import"./store.B0ay3j7c.js";import"./userspace.B-cLyS_3.js";/*!-----------------------------------------------------------------------------
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Version: 0.52.2(404545bded1df6ffa41ea0af4e8ddb219018c6c1)
  * Released under the MIT license

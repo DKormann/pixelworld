@@ -13,6 +13,10 @@ window.MonacoEnvironment = {
   }
 };
 
+
+
+
+
 import { defaultScript } from './userspace';
 
 export const userScriptTS = new Writable("UserScriptTS", defaultScript);

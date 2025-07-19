@@ -42,9 +42,6 @@ DbConnection.builder()
   .onApplied(c=>{
     let player = c.db.person.conn.find(id)!
     const send_action = (action:GameAction)=>{
-      console.log("send action", action);
-      
-
       return new Promise<void>((resolve, reject)=>{
         actionqueue.set(action.id, res=>{
           if (res.tag == "Ok"){ resolve() }
@@ -73,7 +70,6 @@ DbConnection.builder()
       c.db.tile.onUpdate((_,o,n) => {
         let block = state.world.getPixel(int2pos(o.pos))!
         block.pos = int2pos(n.pos)
-        console.log(block.pos);
         block.energy = n.energy
         state.world.setPixel(int2pos(o.pos), null);
         state.world.setPixel(int2pos(n.pos), n)
@@ -92,8 +88,6 @@ DbConnection.builder()
       let bod = state.world.getPixel(int2pos(pos))!
 
       LoadUserFunction().then(fn=>{
-        console.log(fn);
-        
         fn(state, bod)
       });
 
