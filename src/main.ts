@@ -5,21 +5,26 @@ import { LoadUserFunction } from './userspace';
 
 const app = document.querySelector<HTMLDivElement>('#app')!
 
-const serverUrl = window.location.pathname.split("/").includes("local") ? "ws://localhost:3000" : "wss://maincloud.spacetimedb.com"
 
 
-let dbtoken = new Writable("dbtoken", "")
+const servermode : 'local'|'remote' = (window.location.pathname.split("/").includes("local")) ? 'local' : 'remote';
+
+const dbname = "pixel"
+
+const serverUrl = servermode == 'local' ? "ws://localhost:3000" : "wss://maincloud.spacetimedb.com"
+
+const dbtoken = new Writable<string>(dbname + servermode + "-token", "")
+
+
 
 import { Block, int2pos, makestate, world_size } from './world';
 
 DbConnection.builder()
 .withUri(serverUrl)
-.withModuleName("pixel")
+.withModuleName(dbname)
 .withToken(dbtoken.value)
 .onConnect((connect, id, token )=>{
 
-
-  console.log("connected.");
   dbtoken.set(token)
   let actionqueue = new Map<number, (r:ActionResultVariant)=>void> ()
 

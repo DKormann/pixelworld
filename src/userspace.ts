@@ -68,7 +68,7 @@ const script = `/**
  */
 function main(state, player) {
   console.log("OKOK")
-  state.keyboard.subscribe(console.error);
+  state.keyboard.subscribe(console.log);
 }
 ` + "return main"
 
@@ -85,7 +85,7 @@ export async function LoadUserFunction(){
     
     return Function(text+"return main")() as (s:State, player:Block) => void
   }catch (e){
-    console.error(e);
+    console.log(e);
     
     return Function(script)() as (s:State, player:Block) => void
   }

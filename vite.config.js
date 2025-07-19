@@ -1,25 +1,9 @@
-// import { defineConfig } from "vite";
-
-// export default defineConfig({
-//   build:{
-//     rollupOptions:{
-//       input: {
-//         main: '/index.html',
-//         code: '/code.html',
-//       }
-//     }
-//   }
-// });
-
 
 import { defineConfig, loadEnv } from 'vite'
 
 export default defineConfig(({ command, mode }) => {
 
-  // Load environment variables
   const env = loadEnv(mode, process.cwd(), '');
-
-  // Determine base path
   const base = command === 'build' && env.BUILD_TARGET === 'gh-pages'
     ? '/pixelworld/'
     : '/';
@@ -40,6 +24,9 @@ export default defineConfig(({ command, mode }) => {
         input: {
           main : "index.html",
           // notFound: "404.html",
+          code: "code.html",
+          monaco: "monaco.html"
+
         },
         output: {
           entryFileNames: 'assets/[name].[hash].js',
