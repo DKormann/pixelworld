@@ -42,6 +42,8 @@ DbConnection.builder()
   .onApplied(c=>{
     let player = c.db.person.conn.find(id)!
     const send_action = (action:GameAction)=>{
+      console.log("send action", action);
+      
 
       return new Promise<void>((resolve, reject)=>{
         actionqueue.set(action.id, res=>{

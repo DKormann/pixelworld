@@ -106,6 +106,7 @@ export function makestate (act:(action:GameAction)=>Promise<void>) : State {
         id:actioncounter ++,
         player:t.id,
       }).then(()=>{
+        
         let c = world.getPixel(p)!
         if (!c){
           throw new Error("new Block not found")
@@ -150,8 +151,6 @@ export function makestate (act:(action:GameAction)=>Promise<void>) : State {
   return{
 
     world,
-
-
 
     keyboard: (() => {
       const keyStates = new Map<string, boolean>();

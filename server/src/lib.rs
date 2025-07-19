@@ -198,9 +198,9 @@ fn do_action(ctx:&ReducerContext, sender:Identity, action:GameAction)->Result<Do
     },
     ActionType::Put(putaction) => {
       if ctx.db.tile().pos().find(action.pos).is_some(){
-        return Err("no block at pos.".to_string())
+        return Err("position blocked".to_string())
       }
-      ctx.db.tile().insert(
+      ctx.db.tile().try_insert(
         Tile{
           pos: action.pos,
           owner: player.id,
@@ -208,7 +208,7 @@ fn do_action(ctx:&ReducerContext, sender:Identity, action:GameAction)->Result<Do
           energy: putaction.energy,
           color: putaction.color,
           last_action: ctx.timestamp,
-        });
+        })?;
       10 + putaction.energy as i32
     },
     ActionType::Move => {
