@@ -16,65 +16,13 @@ window.MonacoEnvironment = {
 
 
 
-const defaultScript = `
+const defaultScript = "function main(state, player) {\n    state.keyboard.subscribe(function (e) {\n        console.log(e);\n        var x = 0;\n        var y = 0;\n        if (e == \"ArrowUp\")\n            y -= 1;\n        if (e == \"ArrowDown\")\n            y += 1;\n        if (e == \"ArrowLeft\")\n            x -= 1;\n        if (e == \"ArrowRight\")\n            x += 1;\n        target = [player.pos[0] + x, player.pos[1] + y];\n        yield player.move(target);\n    });\n}\n"
 
-
-
-
-type Color = [number,number,number]
-
-type Block = {
-  alive: boolean
-  move:(pos:Pos)=>Promise<Block>
-  del:(pos:Pos)=>Promise<void>
-  put:(pos:Pos, color:Color, energy?:number) => Promise<Block>
-
-  energy: number
-  pos: Pos
-  id: number
-  color: Color
-}
-type Pos = [number, number]
-
-type State = {
-  world: {
-    pixels: (null | Block)[][];
-    subscribe: (fn: (focus: Pos | undefined) => void) => () => void;
-    getPixel: (pos: Pos) => Block | null;
-  };
-  keyboard: {
-    isPressed: (key: string) => boolean;
-    subscribe: (fn: (key: string) => void) => () => void;
-  };
-};
-
-
-type UserAction = {
-  type:"Move" | "Delete"
-  pos: Pos
-} | {
-  type:"Put"
-  pos: Pos
-  color: Color
-  energy: number
-}
-
-
-
-function main(state:State, player:Block){
-
-  state.keyboard.subscribe(console.log)
-
-  console.log(player);
-  
-
-}
-`
 
 
 export const userScriptTS = new Writable("UserScriptTS", defaultScript);
 
-userScriptTS.set(defaultScript)
+// userScriptTS.set(defaultScript)
 export const userScript = new Writable("UserScript", "");
 
 window.document.addEventListener("keydown", (e) => {

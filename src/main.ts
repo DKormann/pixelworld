@@ -136,7 +136,7 @@ codebutton.onclick = () => {
 }
 
 addPermanentEventListener('keyup', e => {
-  if(e.key === 'Escape') codebutton.click()
+  if(e.key === 'Escape' || e.key =="Tab") codebutton.click()
 })
 
 const block_size = canvas.width / world_size
