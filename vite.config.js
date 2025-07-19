@@ -25,7 +25,7 @@ export default defineConfig(({ command, mode }) => {
           main : "index.html",
           // notFound: "404.html",
           code: "code.html",
-          monaco: "monaco.html"
+          editor: "editor.html"
 
         },
         output: {

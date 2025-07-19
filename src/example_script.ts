@@ -3,7 +3,6 @@
 
 type Color = [number,number,number]
 
-
 export type Block = {
   alive: boolean
   move:(pos:Pos)=>Promise<Block>
@@ -15,19 +14,6 @@ export type Block = {
   id: number
   color: Color
 }
-
-
-// type Action = {
-//   type:"Move" | "Delete"
-//   pos: Pos
-// } | {
-//   type:"Put"
-//   pos: Pos
-//   color:Color
-//   energy: number
-// }
-
-
 export type Pos = [number, number]
 
 export type State = {

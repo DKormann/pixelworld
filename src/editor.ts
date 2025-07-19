@@ -1,60 +1,121 @@
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import 'monaco-editor/esm/vs/basic-languages/typescript/typescript.contribution';
+import { Writable } from './store';
+
+import * as ts from "typescript"
+
+
 
 // Wait for monaco to be fully loaded
 window.MonacoEnvironment = {
-    getWorkerUrl: function (moduleId, label) {
-        return './vs/base/worker/workerMain.js';
-    }
+  getWorkerUrl: function (moduleId, label) {
+    return './vs/base/worker/workerMain.js';
+  }
+
 };
 
-// Compile TypeScript to JavaScript using Monaco's worker API
-async function compileTypeScript(code: string): Promise<string> {
-    // Get the TypeScript worker
-    const workerService = await monaco.languages.typescript.getTypeScriptWorker();
-    const worker = await workerService();
 
-    // Get the emit output
-    const emitOutput = await worker.getEmitOutput(code);
-    if (emitOutput.emitSkipped) {
-        throw new Error('TypeScript compilation failed');
-    }
-    return emitOutput.outputFiles[0].text;
+
+const defaultScript = `
+
+
+
+
+type Color = [number,number,number]
+
+type Block = {
+  alive: boolean
+  move:(pos:Pos)=>Promise<Block>
+  del:(pos:Pos)=>Promise<void>
+  put:(pos:Pos, color:Color, energy?:number) => Promise<Block>
+
+  energy: number
+  pos: Pos
+  id: number
+  color: Color
+}
+type Pos = [number, number]
+
+type State = {
+  world: {
+    pixels: (null | Block)[][];
+    subscribe: (fn: (focus: Pos | undefined) => void) => () => void;
+    getPixel: (pos: Pos) => Block | null;
+  };
+  keyboard: {
+    isPressed: (key: string) => boolean;
+    subscribe: (fn: (key: string) => void) => () => void;
+  };
+};
+
+
+type UserAction = {
+  type:"Move" | "Delete"
+  pos: Pos
+} | {
+  type:"Put"
+  pos: Pos
+  color: Color
+  energy: number
 }
 
-// Wait for DOM to be ready
+
+
+function main(state:State, player:Block){
+
+  state.keyboard.subscribe(console.log)
+
+  console.log(player);
+  
+
+}
+`
+
+
+export const userScriptTS = new Writable("UserScriptTS", defaultScript);
+
+userScriptTS.set(defaultScript)
+export const userScript = new Writable("UserScript", "");
+
+window.document.addEventListener("keydown", (e) => {
+  if(e.key == "s" && e.metaKey){
+    e.preventDefault()
+
+    window.location.pathname = window.location.pathname.split("/").filter(s=>s!="editor").join("/") + (new Writable("servermode","").value == "local" ? "local" : "")
+  }
+
+})
+
+
 window.addEventListener('load', async () => {
-    // Create the editor
-    const editor = monaco.editor.create(document.getElementById('editor')!, {
-        theme: 'vs-dark',
-        language: 'typescript',
-        automaticLayout: true,
-        minimap: {
-            enabled: true
-        },
-        lineNumbers: 'on',
-        fontSize: 14,
-        wordWrap: 'on',
-        scrollBeyondLastLine: false,
-        renderWhitespace: 'selection',
-        renderControlCharacters: true,
-        formatOnPaste: true,
-        formatOnType: true
-    });
+  // Create the editor
+  const editor = monaco.editor.create(document.getElementById('editor')!, {
+    theme: 'vs-dark',
+    language: 'typescript',
+    automaticLayout: true,
+    minimap: {
+      enabled: true
+    },
+    lineNumbers: 'on',
+    fontSize: 14,
+    wordWrap: 'on',
+    scrollBeyondLastLine: false,
+    renderWhitespace: 'selection',
+    renderControlCharacters: true,
+    formatOnPaste: true,
+    formatOnType: true,
+    tabSize: 2,
+  });
 
-    // Set initial value
-    editor.setValue('console.log("Hello TypeScript!");\nconst message: string = "Hello, World!";\nconsole.log(message);');
+  editor.setValue(userScriptTS.value);
 
-    // Add change listener to compile code
-    editor.onDidChangeModelContent(async () => {
-        const code = editor.getValue();
-        console.log('Code changed:', code);
 
-        try {
-            const result = await compileTypeScript(code);
-            console.log('Compiled JavaScript:', result);
-        } catch (error) {
-            console.error('Compilation error:', error);
-        }
-    });
+
+  // Add change listener to compile code
+  editor.onDidChangeModelContent(async () => {
+    const code = editor.getValue();
+    userScriptTS.set(code);
+    const jscode = ts.transpile(code)
+    userScript.set(jscode);
+  });
 });

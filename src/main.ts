@@ -7,13 +7,13 @@ const app = document.querySelector<HTMLDivElement>('#app')!
 
 
 
-const servermode : 'local'|'remote' = (window.location.pathname.split("/").includes("local")) ? 'local' : 'remote';
-
 const dbname = "pixel"
 
-const serverUrl = servermode == 'local' ? "ws://localhost:3000" : "wss://maincloud.spacetimedb.com"
+const servermode = new Writable("servermode", "remote");
+servermode.set((window.location.pathname.split("/").includes("local")) ? 'local' : 'remote')
 
-const dbtoken = new Writable<string>(dbname + servermode + "-token", "")
+const serverUrl = servermode.value == 'local' ? "ws://localhost:3000" : "wss://maincloud.spacetimedb.com"
+const dbtoken = new Writable<string>(dbname + servermode.value + "-token", "")
 
 
 
@@ -131,8 +131,9 @@ const ctx = canvas.getContext('2d')!
 // const player = new Writable('player', {position:{x:0, y:0}, energy:0, id:"0"})
 const addPermanentEventListener = document.addEventListener.bind(document);
 
-
-codebutton.onclick = () => {window.location.href = '/code'}
+codebutton.onclick = () => {
+  window.location.pathname = window.location.pathname.split("/").filter(s=>s!="local").join("/") + "editor"
+}
 
 addPermanentEventListener('keyup', e => {
   if(e.key === 'Escape') codebutton.click()
@@ -157,4 +158,6 @@ function draw_world(pixels: (null | Block)[][]){
     }
   }))
 }
+
+
 
