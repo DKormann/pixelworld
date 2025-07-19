@@ -17,15 +17,15 @@ export type Block = {
 }
 
 
-type Action = {
-  type:"Move" | "Delete"
-  pos: Pos
-} | {
-  type:"Put"
-  pos: Pos
-  color:Color
-  energy: number
-}
+// type Action = {
+//   type:"Move" | "Delete"
+//   pos: Pos
+// } | {
+//   type:"Put"
+//   pos: Pos
+//   color:Color
+//   energy: number
+// }
 
 
 export type Pos = [number, number]
@@ -58,6 +58,9 @@ export type UserAction = {
 export function main(state:State, player:Block){
 
   state.keyboard.subscribe(console.log)
+
+  console.log(player);
+  
 
 }
 

@@ -76,7 +76,7 @@ function main(state, player) {
 
 export async function LoadUserFunction(){
 
-  // try{
+  try{
 
     let res = await fetch(`http://127.0.0.1:8080/example_script.js?${Date.now()}`)
     let text = await res.text()
@@ -84,11 +84,11 @@ export async function LoadUserFunction(){
     console.log(text);
     
     return Function(text+"return main")() as (s:State, player:Block) => void
-  // }catch (e){
-  //   console.error(e);
+  }catch (e){
+    console.error(e);
     
-  //   return Function(script)() as (s:State, player:Block) => void
-  // }
+    return Function(script)() as (s:State, player:Block) => void
+  }
 }
 
 

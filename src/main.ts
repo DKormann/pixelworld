@@ -1,5 +1,5 @@
 import { Writable } from './store'
-import { ActionResultVariant, ActionType, DbConnection, EventContext, GameAction, Person, PutAction, ReducerEventContext, Tile } from './module_bindings';
+import { ActionResultVariant, DbConnection, GameAction, Person } from './module_bindings';
 
 import { LoadUserFunction } from './userspace';
 
@@ -9,7 +9,7 @@ const app = document.querySelector<HTMLDivElement>('#app')!
 
 let dbtoken = new Writable("dbtoken", "")
 
-import { Block, int2color, int2pos, makestate, Pos, State, world_size } from './world';
+import { Block, int2pos, makestate, world_size } from './world';
 
 DbConnection.builder()
 .withUri("ws://localhost:3000")
@@ -18,7 +18,6 @@ DbConnection.builder()
 .onConnect((connect, id, token )=>{
 
 
-  let actionid = 0;
   console.log("connected.");
   dbtoken.set(token)
   let actionqueue = new Map<number, (r:ActionResultVariant)=>void> ()
@@ -48,8 +47,8 @@ DbConnection.builder()
     }
     let state = makestate(send_action)
 
-    c.db.person.onInsert((c,p)=>onPersonChange(p))
-    c.db.person.onUpdate((c,o,n)=>onPersonChange(n))
+    c.db.person.onInsert((_,p)=>onPersonChange(p))
+    c.db.person.onUpdate((_,_o,n)=>onPersonChange(n))
     connect.subscriptionBuilder()
     .onApplied(c=>{
 
@@ -59,11 +58,11 @@ DbConnection.builder()
         state.world.setPixel(int2pos(tile.pos), tile)
       }
 
-      c.db.tile.onInsert((c,i) => {
+      c.db.tile.onInsert((_,i) => {
         state.world.setPixel(int2pos(i.pos), i)
         draw_world(state.world.pixels)
       })
-      c.db.tile.onUpdate((u,o,n) => {
+      c.db.tile.onUpdate((_,o,n) => {
         let block = state.world.getPixel(int2pos(o.pos))!
         block.pos = int2pos(n.pos)
         console.log(block.pos);
@@ -73,7 +72,7 @@ DbConnection.builder()
         draw_world(state.world.pixels)
 
       })
-      c.db.tile.onDelete((d, old) => {
+      c.db.tile.onDelete((_, old) => {
         state.world.getPixel(int2pos(old.pos))!.alive = false
         state.world.setPixel(int2pos(old.pos), null)
         draw_world(state.world.pixels)
@@ -123,7 +122,7 @@ canvas.width = csize
 canvas.height = csize
 app.appendChild(canvas)
 const ctx = canvas.getContext('2d')!
-const player = new Writable('player', {position:{x:0, y:0}, energy:0, id:"0"})
+// const player = new Writable('player', {position:{x:0, y:0}, energy:0, id:"0"})
 const addPermanentEventListener = document.addEventListener.bind(document);
 
 

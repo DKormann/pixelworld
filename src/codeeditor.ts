@@ -1,5 +1,5 @@
 // import {custom_script, last_character, active_script} from './store'
-import { button } from './main'
+
 import { load_script, active_character, custom_script, active_script } from './scripting'
 
 const codeeditor = document.createElement('div')

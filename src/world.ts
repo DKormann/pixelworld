@@ -1,6 +1,6 @@
 
 
-import { DbConnection, GameAction, Tile, ActionType } from "./module_bindings";
+import { GameAction, Tile } from "./module_bindings";
 
 
 

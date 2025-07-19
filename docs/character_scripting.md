@@ -2,6 +2,8 @@
 
 Welcome to the character scripting documentation for the game! This guide will help you create and customize your own character behaviors using JavaScript.
 
+Your Character Script will send requests to the Server that will let you interact with the Game world.
+
 ## Quickstart
 
 click on Show Code in the top left, select one of the Available characters, maybe edit its code and click play in the top left again to use the character. If you die you can click Reset Player.
@@ -10,11 +12,11 @@ click on Show Code in the top left, select one of the Available characters, mayb
 
 The game comes with several pre-built character scripts that you can use as examples:
 - `snake`: A basic character that moves around
-- `pan`: A gray character with shooting capabilities
-- `snake`: A green moving character
-- `eater`: A character that eats other blocks
-- `hydra`: A black character with shooting abilities
-- `misterX`: A red character with shooting capabilities
+- `pan`: A basic character shooting character
+- `snake` : A snake character that spawns a tail
+- `eater`: A snake like character that eats all blocks in front
+- `hydra`: A faster more dangerous snake that also shoots
+- `misterX`: The fastest and most deadly shooter
 
 
 ## Available Functions
@@ -63,63 +65,15 @@ The `player` object contains the following properties:
 The `state` object provides access to the game world:
 - `state.world`: 2D array representing the game world
 
-## Example Script
 
-Here's a complete example of a basic character script:
+## Action Rules
 
-```javascript
-let color = '#00ff00'
-let speed = 1
-let interval = 1000/20
-let direction = [0, 0]
+Each Player has Up to 100 energy, which regenerates over time
 
-function setkeymap(key, active) {
-    keymap.set(key, active)
-    direction = [keymap.get('ArrowRight') - keymap.get('ArrowLeft'), 
-                keymap.get('ArrowDown') - keymap.get('ArrowUp')]
-    if (direction[0] || direction[1]) {
-        if (!running) {
-            running = true
-            walk()
-        }
-    } else {
-        running = false
-    }
-}
+actions cost or gain energy:
+  - put: costs 10 energy
+  - move: costs 0 energy
+  - delete: generates 10 energy
 
-async function step() {
-    const x = player.position.x
-    const y = player.position.y
-    const endx = x + direction[0] * speed
-    const endy = y + direction[1] * speed
-    
-    await action({
-        action: 'move',
-        x, y, endx, endy
-    })
-    .then(() => action({
-        action: 'put',
-        color: color,
-        x, y
-    }))
-    .catch(e => console.log("walk error:", e))
-}
+BUT: every action costs more energy the further away you are from the action target. So you cannot just delete every block at once.
 
-async function walk() {
-    if (!running) return
-    await step()
-    setTimeout(walk, interval)
-}
-
-const keymap = new Map(["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].map(key => [key, false]))
-
-// Event listeners
-document.addEventListener('keydown', e => {
-    if (e.key.startsWith("Arrow")) e.preventDefault()
-    setkeymap(e.key, true)
-})
-
-document.addEventListener('keyup', e => {
-    setkeymap(e.key, false)
-})
-```
